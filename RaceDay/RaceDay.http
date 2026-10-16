@@ -1,0 +1,65 @@
+@RaceDay_HostAddress = http://localhost:5294
+
+### Health
+GET {{RaceDay_HostAddress}}/weatherforecast/
+Accept: application/json
+
+### Register (public)
+POST {{RaceDay_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "User",
+  "email": "test.user@example.com",
+  "password": "Password123!",
+  "phone": "0123456789"
+}
+
+### Login (public) - will set auth cookie when run in a client that supports cookies
+POST {{RaceDay_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test.user@example.com",
+  "password": "Password123!"
+}
+
+### Get current user (requires cookie)
+GET {{RaceDay_HostAddress}}/api/auth/me
+
+### Create event (Organiser only) - requires cookie for an organiser
+POST {{RaceDay_HostAddress}}/api/events
+Content-Type: application/json
+
+{
+  "eventName": "Sample Race",
+  "eventDate": "2026-10-01T09:00:00Z",
+  "location": "Central Park",
+  "distance": 10.0,
+  "eventTypeID": 1
+}
+
+### Get events
+GET {{RaceDay_HostAddress}}/api/events
+
+### Enrol (Participant only)
+POST {{RaceDay_HostAddress}}/api/enrollments
+Content-Type: application/json
+
+{
+  "eventID": 1,
+  "categoryID": 1
+}
+
+### Create result (Organiser only)
+POST {{RaceDay_HostAddress}}/api/results
+Content-Type: application/json
+
+{
+  "enrollmentID": 1,
+  "finishTime": "00:45:30",
+  "finishingPosition": 1
+}
+
+###
