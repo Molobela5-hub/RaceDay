@@ -1,5 +1,5 @@
 ﻿
-using System.Security.Claims;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -126,7 +126,7 @@ namespace RaceDay.Controllers
         {
             var category = await _context.Categories.FindAsync(id);
 
-          
+            if (category == null)
                 return NotFound();
 
             var ev = await _context.Events.FindAsync(category.EventID);
