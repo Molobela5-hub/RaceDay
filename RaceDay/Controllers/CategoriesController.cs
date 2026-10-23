@@ -50,6 +50,15 @@ namespace RaceDay.Controllers
         [HttpPost]
         public async Task<ActionResult<Category>> CreateCategory(Category category)
         {
+            if (string.IsNullOrWhiteSpace(category.CategoryName) ||
+                string.IsNullOrWhiteSpace(category.CategoryType))
+            {
+                return BadRequest(new
+                {
+                    message = "Category name and category type are required."
+                });
+            }
+
             // Verify the referenced event exists and belongs to the organiser.
             var ev = await _context.Events.FindAsync(category.EventID);
 

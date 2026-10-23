@@ -16,11 +16,32 @@ namespace RaceDay.Controllers
     {
         private readonly RaceDayContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly IConfiguration _configuration;
 
-        public AuthController(RaceDayContext context, IPasswordHasher<User> passwordHasher)
+        private static string NormalizeEmail(string email) =>
+            email.Trim().ToUpperInvariant();
+
+        private static bool IsValidEmail(string email)
+        {
+            try
+            {
+                _ = new System.Net.Mail.MailAddress(email);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public AuthController(
+            RaceDayContext context,
+            IPasswordHasher<User> passwordHasher,
+            IConfiguration configuration)
         {
             _context = context;
             _passwordHasher = passwordHasher;
+            _configuration = configuration;
         }
 
         // POST: api/auth/register
@@ -48,17 +69,15 @@ namespace RaceDay.Controllers
             }
 
             var email = request.Email.Trim();
-            // Basic email format validation.
-            try
-            {
-                new System.Net.Mail.MailAddress(email);
-            }
-            catch
+            var normalizedEmail = NormalizeEmail(email);
+
+            if (!IsValidEmail(email))
             {
                 return BadRequest(new { message = "Invalid email address." });
             }
 
-            if (await _context.Users.AnyAsync(u => u.Email == email))
+            if (await _context.Users.AnyAsync(u =>
+                    u.Email.ToUpper() == normalizedEmail))
             {
                 return Conflict(new
                 {
@@ -101,6 +120,22 @@ namespace RaceDay.Controllers
         [HttpPost("create-organiser")]
         public async Task<IActionResult> CreateOrganiser(RegisterRequest request)
         {
+            var provisioningKey = _configuration["Auth:OrganiserProvisioningKey"];
+
+            if (string.IsNullOrWhiteSpace(provisioningKey))
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, new
+                {
+                    message = "Organiser provisioning is not configured."
+                });
+            }
+
+            if (!Request.Headers.TryGetValue("X-Admin-Provision-Key", out var key) ||
+                !string.Equals(key.ToString(), provisioningKey, StringComparison.Ordinal))
+            {
+                return Forbid();
+            }
+
             if (string.IsNullOrWhiteSpace(request.FirstName) ||
                 string.IsNullOrWhiteSpace(request.LastName) ||
                 string.IsNullOrWhiteSpace(request.Email) ||
@@ -121,16 +156,15 @@ namespace RaceDay.Controllers
             }
 
             var email = request.Email.Trim();
-            try
-            {
-                new System.Net.Mail.MailAddress(email);
-            }
-            catch
+            var normalizedEmail = NormalizeEmail(email);
+
+            if (!IsValidEmail(email))
             {
                 return BadRequest(new { message = "Invalid email address." });
             }
 
-            if (await _context.Users.AnyAsync(u => u.Email == email))
+            if (await _context.Users.AnyAsync(u =>
+                    u.Email.ToUpper() == normalizedEmail))
             {
                 return Conflict(new
                 {
@@ -178,9 +212,11 @@ namespace RaceDay.Controllers
             }
 
             var email = request.Email.Trim();
+            var normalizedEmail = NormalizeEmail(email);
 
             var user = await _context.Users
-                .SingleOrDefaultAsync(u => u.Email == email);
+                .SingleOrDefaultAsync(u =>
+                    u.Email.ToUpper() == normalizedEmail);
 
             if (user == null)
             {
@@ -332,7 +368,6 @@ namespace RaceDay.Controllers
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public string? Phone { get; set; }
-        public string? Role { get; set; }
     }
 
     public class LoginRequest

@@ -50,6 +50,34 @@ namespace RaceDay.Controllers
         [HttpPost]
         public async Task<ActionResult<Event>> CreateEvent(Event raceEvent)
         {
+            if (string.IsNullOrWhiteSpace(raceEvent.EventName) ||
+                string.IsNullOrWhiteSpace(raceEvent.Location))
+            {
+                return BadRequest(new
+                {
+                    message = "Event name and location are required."
+                });
+            }
+
+            if (raceEvent.Distance <= 0)
+            {
+                return BadRequest(new
+                {
+                    message = "Distance must be greater than zero."
+                });
+            }
+
+            var eventTypeExists = await _context.EventTypes
+                .AnyAsync(t => t.EventTypeID == raceEvent.EventTypeID);
+
+            if (!eventTypeExists)
+            {
+                return BadRequest(new
+                {
+                    message = "Event type does not exist."
+                });
+            }
+
             // Ensure organiser cannot set OrganiserID for another user.
             raceEvent.OrganiserID = CurrentUserId;
 
@@ -82,6 +110,34 @@ namespace RaceDay.Controllers
 
             // Do not allow changing the organiser.
             updatedEvent.OrganiserID = existingEvent.OrganiserID;
+
+            if (string.IsNullOrWhiteSpace(updatedEvent.EventName) ||
+                string.IsNullOrWhiteSpace(updatedEvent.Location))
+            {
+                return BadRequest(new
+                {
+                    message = "Event name and location are required."
+                });
+            }
+
+            if (updatedEvent.Distance <= 0)
+            {
+                return BadRequest(new
+                {
+                    message = "Distance must be greater than zero."
+                });
+            }
+
+            var eventTypeExists = await _context.EventTypes
+                .AnyAsync(t => t.EventTypeID == updatedEvent.EventTypeID);
+
+            if (!eventTypeExists)
+            {
+                return BadRequest(new
+                {
+                    message = "Event type does not exist."
+                });
+            }
 
             _context.Entry(existingEvent)
                 .CurrentValues.SetValues(updatedEvent);
