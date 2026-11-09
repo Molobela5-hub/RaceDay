@@ -21,6 +21,13 @@
             <input asp-for="EnrollmentID" type="hidden" />
             <input asp-for="EventID" type="hidden" />
 
+            @if (!Model.CategoryOptions.Any())
+            {
+                <div class="alert alert-warning" role="alert">
+                    Categories could not be loaded for this event. Please try again later.
+                </div>
+            }
+
             <div class="mb-3">
                 <label asp-for="CategoryID" class="form-label">Category</label>
                 <select asp-for="CategoryID" asp-items="Model.CategoryOptions" class="form-select" required aria-describedby="categoryHelp">
@@ -30,7 +37,7 @@
                 <span asp-validation-for="CategoryID" class="text-danger"></span>
             </div>
 
-            <button class="btn btn-primary" type="submit" data-submit-text="Saving...">Save</button>
+            <button class="btn btn-primary" type="submit" data-submit-text="Saving..." disabled="@(!Model.CategoryOptions.Any())">Save</button>
             <a class="btn btn-outline-secondary" asp-action="MyEnrolments">Cancel</a>
             <a class="btn btn-link" asp-action="UpcomingEvents">Back to events</a>
         </form>
