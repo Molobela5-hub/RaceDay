@@ -31,7 +31,17 @@ else
                 {
                     <tr>
                         <td>@item.EventName<br/><small class="text-muted">@item.Location</small></td>
-                        <td>@item.EventDate.ToString("g")</td>
+                        <td>
+                            @item.EventDate.ToString("g")
+                            @if (item.IsLocked)
+                            {
+                                <div><span class="badge text-bg-secondary">Locked</span></div>
+                            }
+                            else
+                            {
+                                <div><span class="badge text-bg-success">Editable</span></div>
+                            }
+                        </td>
                         <td>@item.CategoryName</td>
                         <td>@item.EnrollmentDate.ToString("g")</td>
                         <td>
