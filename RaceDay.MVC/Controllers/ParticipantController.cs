@@ -117,7 +117,6 @@ public class ParticipantController : Controller
         var now = DateTime.UtcNow;
 
         var rows = enrollmentsResponse.Data?
-            .OrderByDescending(x => x.EnrollmentDate)
             .Select(x =>
             {
                 eventsById.TryGetValue(x.EventID, out var ev);
@@ -134,7 +133,10 @@ public class ParticipantController : Controller
                     EnrollmentDate = x.EnrollmentDate,
                     CanEdit = ev is not null && ev.EventDate > now && !enrollmentIdsWithResult.Contains(x.EnrollmentID)
                 };
-            }).ToList() ?? [];
+            })
+            .OrderBy(x => x.EventDate)
+            .ThenBy(x => x.EventName)
+            .ToList() ?? [];
 
         return View(rows);
     }
