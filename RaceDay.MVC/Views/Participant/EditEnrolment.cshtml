@@ -16,7 +16,7 @@
             <div class="text-muted">@Model.EventDate.ToString("f") - @Model.Location</div>
         </div>
 
-        <form asp-action="EditEnrolment" method="post">
+        <form asp-action="EditEnrolment" method="post" data-prevent-double-submit="true">
             @Html.AntiForgeryToken()
             <input asp-for="EnrollmentID" type="hidden" />
             <input asp-for="EventID" type="hidden" />
@@ -30,7 +30,7 @@
                 <span asp-validation-for="CategoryID" class="text-danger"></span>
             </div>
 
-            <button class="btn btn-primary" type="submit">Save</button>
+            <button class="btn btn-primary" type="submit" data-submit-text="Saving...">Save</button>
             <a class="btn btn-outline-secondary" asp-action="MyEnrolments">Cancel</a>
         </form>
     </div>
