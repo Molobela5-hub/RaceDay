@@ -23,9 +23,10 @@
 
             <div class="mb-3">
                 <label asp-for="CategoryID" class="form-label">Category</label>
-                <select asp-for="CategoryID" asp-items="Model.CategoryOptions" class="form-select" required>
+                <select asp-for="CategoryID" asp-items="Model.CategoryOptions" class="form-select" required aria-describedby="categoryHelp">
                     <option value="" disabled selected>Select category</option>
                 </select>
+                <div id="categoryHelp" class="form-text">Only categories available for this event are listed.</div>
                 <span asp-validation-for="CategoryID" class="text-danger"></span>
             </div>
 
