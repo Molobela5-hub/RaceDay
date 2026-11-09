@@ -185,6 +185,22 @@ public class ParticipantController : Controller
             return View(reload);
         }
 
+        var categoriesResponse = await _categoriesApi.GetAllAsync();
+        var categoryBelongsToEvent = categoriesResponse.Data?
+            .Any(x => x.EventID == model.EventID && x.CategoryID == model.CategoryID) == true;
+
+        if (!categoryBelongsToEvent)
+        {
+            ModelState.AddModelError(nameof(model.CategoryID), "Selected category is not valid for this event.");
+            var reload = await LoadEditEnrollmentModel(model.EnrollmentID, model.CategoryID);
+            if (reload is null)
+            {
+                return RedirectToAction(nameof(MyEnrolments));
+            }
+
+            return View(reload);
+        }
+
         var update = await _enrollmentsApi.UpdateAsync(new EnrollmentDto
         {
             EnrollmentID = model.EnrollmentID,
