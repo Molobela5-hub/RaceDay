@@ -187,6 +187,25 @@ public class ParticipantController : Controller
             return View(reload);
         }
 
+        var existingEnrollment = await _enrollmentsApi.GetByIdAsync(model.EnrollmentID);
+        if (!existingEnrollment.Success || existingEnrollment.Data is null)
+        {
+            TempData["Error"] = existingEnrollment.ErrorMessage ?? "Enrolment not found.";
+            return RedirectToAction(nameof(MyEnrolments));
+        }
+
+        if (existingEnrollment.Data.EventID != model.EventID)
+        {
+            ModelState.AddModelError(string.Empty, "Invalid enrolment event reference.");
+            var reload = await LoadEditEnrollmentModel(model.EnrollmentID, model.CategoryID);
+            if (reload is null)
+            {
+                return RedirectToAction(nameof(MyEnrolments));
+            }
+
+            return View(reload);
+        }
+
         var categoriesResponse = await _categoriesApi.GetAllAsync();
         var categoryBelongsToEvent = categoriesResponse.Data?
             .Any(x => x.EventID == model.EventID && x.CategoryID == model.CategoryID) == true;
