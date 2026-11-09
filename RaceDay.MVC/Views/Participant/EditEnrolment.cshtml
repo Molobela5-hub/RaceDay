@@ -13,7 +13,7 @@
         <div class="mb-3">
             <label class="form-label">Event</label>
             <div class="form-control-plaintext">@Model.EventName</div>
-            <div class="text-muted">@Model.EventDate.ToString("f") - @Model.Location</div>
+            <div class="text-muted">@Model.EventDate.ToString("dddd, dd MMM yyyy HH:mm") · @Model.Location</div>
         </div>
 
         <form asp-action="EditEnrolment" method="post" data-prevent-double-submit="true">
