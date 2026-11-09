@@ -34,9 +34,9 @@ else
                         <td>
                             @if (item.CanEdit)
                             {
-                                <a class="btn btn-outline-primary btn-sm" asp-action="EditEnrolment" asp-route-id="@item.EnrollmentID">Edit</a>
+                                <a class="btn btn-outline-primary btn-sm" asp-action="EditEnrolment" asp-route-id="@item.EnrollmentID" aria-label="Edit enrolment for @item.EventName">Edit</a>
                             }
-                            <form asp-action="CancelEnrolment" method="post" class="d-inline">
+                            <form asp-action="CancelEnrolment" method="post" class="d-inline" aria-label="Cancel enrolment for @item.EventName">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@item.EnrollmentID" />
                                 <button class="btn btn-outline-danger btn-sm" type="submit" onclick="return confirm('Are you sure you want to cancel this enrolment?');">Cancel</button>
